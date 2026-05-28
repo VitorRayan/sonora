@@ -85,6 +85,13 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.App.auth-shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+}
+
 input, select, textarea, button {
   font-family: inherit;
 }

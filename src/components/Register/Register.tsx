@@ -1,12 +1,12 @@
 import { FaUser, FaLock } from 'react-icons/fa'
 import { useState } from 'react'
-
 import toast from 'react-hot-toast'
-
+import type { Screen } from '../../types/screen'
+import { loadUsers, saveUsers } from '../../services/auth'
 import './Register.css'
 
 type Props = {
-  setScreen: React.Dispatch<React.SetStateAction<string>>
+  setScreen: React.Dispatch<React.SetStateAction<Screen>>
 }
 
 export default function Register({ setScreen }: Props) {
@@ -22,13 +22,9 @@ export default function Register({ setScreen }: Props) {
       return
     }
 
-    const users = JSON.parse(
-      localStorage.getItem('users') || '[]'
-    )
+    const users = loadUsers()
 
-    const userExists = users.find(
-      (user: any) => user.email === email
-    )
+    const userExists = users.find((user) => user.email === email)
 
     if (userExists) {
       toast.error('Email já cadastrado')
@@ -38,14 +34,14 @@ export default function Register({ setScreen }: Props) {
     const newUser = {
       email,
       password,
+      role: 'cliente' as const,
+      displayName: email.split('@')[0],
+      projects: [],
     }
 
-    users.push(newUser)
+    const updatedUsers = [...users, newUser]
 
-    localStorage.setItem(
-      'users',
-      JSON.stringify(users)
-    )
+    saveUsers(updatedUsers)
 
     toast.success('Cadastro realizado!')
 
@@ -84,9 +80,7 @@ export default function Register({ setScreen }: Props) {
             type="password"
             placeholder="Confirmar senha"
             required
-            onChange={(e) =>
-              setConfirmPassword(e.target.value)
-            }
+            onChange={(e) => setConfirmPassword(e.target.value)}
           />
 
           <FaLock className="icon" />

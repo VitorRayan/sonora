@@ -1,12 +1,12 @@
 import { FaUser, FaLock } from 'react-icons/fa'
 import { useState } from 'react'
-
 import toast from 'react-hot-toast'
-
+import type { Screen } from '../../types/screen'
+import { findUser, persistLoggedUser } from '../../services/auth'
 import './Login.css'
 
 type Props = {
-  setScreen: React.Dispatch<React.SetStateAction<string>>
+  setScreen: React.Dispatch<React.SetStateAction<Screen>>
 }
 
 export default function Login({ setScreen }: Props) {
@@ -16,25 +16,14 @@ export default function Login({ setScreen }: Props) {
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
 
-    const users = JSON.parse(
-      localStorage.getItem('users') || '[]'
-    )
-
-    const user = users.find(
-      (user: any) =>
-        user.email === email &&
-        user.password === password
-    )
+    const user = findUser(email, password)
 
     if (!user) {
       toast.error('Email ou senha inválidos')
       return
     }
 
-    localStorage.setItem(
-      'loggedUser',
-      JSON.stringify(user)
-    )
+    persistLoggedUser(user)
 
     toast.success('Login realizado!')
 
@@ -52,9 +41,7 @@ export default function Login({ setScreen }: Props) {
             type="email"
             placeholder="E-mail"
             required
-            onChange={(e) =>
-              setEmail(e.target.value)
-            }
+            onChange={(e) => setEmail(e.target.value)}
           />
 
           <FaUser className="icon" />
@@ -65,9 +52,7 @@ export default function Login({ setScreen }: Props) {
             type="password"
             placeholder="Senha"
             required
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
+            onChange={(e) => setPassword(e.target.value)}
           />
 
           <FaLock className="icon" />
@@ -80,9 +65,7 @@ export default function Login({ setScreen }: Props) {
         <div className="signup-link">
           <a
             href="#"
-            onClick={() =>
-              setScreen('register')
-            }
+            onClick={() => setScreen('register')}
           >
             Criar nova conta
           </a>
